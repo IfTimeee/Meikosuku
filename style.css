@@ -1,4 +1,4 @@
-/* ===== Compressed Save 扩展样式 ===== */
+/* ===== Meiko 统一扩展样式 ===== */
 
 .CompressedSave-panel small {
     opacity: 0.85;
@@ -29,25 +29,112 @@
     box-sizing: border-box;
 }
 
-/* 状态徽章 */
-.CompressedSave-panel .cs-badge {
+/* 模块卡片化与子下拉菜单设计 */
+.meiko-hub-intro {
+    padding: 6px 4px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 12px;
+}
+
+.meiko-modules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.meiko-module-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(180, 106, 255, 0.22);
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+}
+.meiko-module-card:hover {
+    border-color: rgba(180, 106, 255, 0.45);
+    box-shadow: 0 4px 14px rgba(180, 106, 255, 0.08);
+}
+
+.meiko-drawer-header {
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(180, 106, 255, 0.06);
+    transition: background 0.15s ease;
+}
+.meiko-drawer-header:hover {
+    background: rgba(180, 106, 255, 0.12);
+}
+
+.meiko-drawer-content {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    /* 限制展开最大高度，避免无限纵向拉长，超出内部平滑滚动 */
+    max-height: 480px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch; /* 保证 iOS/Android 触摸滚动有原生阻尼与顺滑感 */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(180, 106, 255, 0.4) transparent;
+}
+
+/* 自定义纤细滚动条样式，适配深色酒馆主题 */
+.meiko-drawer-content::-webkit-scrollbar {
+    width: 6px;
+}
+.meiko-drawer-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.meiko-drawer-content::-webkit-scrollbar-thumb {
+    background: rgba(180, 106, 255, 0.3);
+    border-radius: 4px;
+}
+.meiko-drawer-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(180, 106, 255, 0.5);
+}
+
+.meiko-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1em;
+}
+.meiko-icon {
+    font-size: 1.1em;
+}
+.meiko-card-desc {
+    font-size: 0.82em;
+    opacity: 0.75;
+    margin-top: 3px;
+}
+
+/* 徽章 */
+.meiko-badge {
     display: inline-block;
     padding: 1px 8px;
     border-radius: 999px;
-    font-size: 0.78em;
-    margin-left: 6px;
+    font-size: 0.75em;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
-.CompressedSave-panel .cs-badge-on {
+.meiko-badge-on {
     background: rgba(70, 200, 120, 0.18);
     color: #46c878;
     border: 1px solid rgba(70, 200, 120, 0.4);
 }
-.CompressedSave-panel .cs-badge-off {
+.meiko-badge-off {
     background: rgba(200, 80, 80, 0.18);
     color: #d66a6a;
     border: 1px solid rgba(200, 80, 80, 0.4);
+}
+.meiko-badge-dev {
+    background: rgba(240, 173, 78, 0.18);
+    color: #f0ad4e;
+    border: 1px solid rgba(240, 173, 78, 0.4);
 }
 
 /* 统计卡片网格 */
@@ -91,15 +178,25 @@
     color: #46c878;
 }
 
-/* 日志区 */
-.CompressedSave-panel .cs-log-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin: 8px 0 4px;
+/* 折叠日志 */
+.meiko-log-accordion {
+    margin-top: 10px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
 }
+.meiko-log-accordion summary {
+    cursor: pointer;
+    font-size: 0.88em;
+    user-select: none;
+    opacity: 0.85;
+}
+.meiko-log-accordion summary:hover {
+    opacity: 1;
+    color: #b46aff;
+}
+
 .CompressedSave-panel .cs-log-wrap {
-    max-height: 280px;
+    max-height: 250px;
     overflow: auto;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 6px;
@@ -149,12 +246,56 @@
 .CompressedSave-panel .cs-st-warn  { color: #c8a046; }
 .CompressedSave-panel .cs-st-err   { color: #d66a6a; }
 
-/* 紧凑型布局响应 */
-@media (max-width: 720px) {
+/* 移动端与安卓专门适配 */
+@media (max-width: 768px) {
+    /* 安卓竖屏或较小屏幕下，抽屉展开限高进一步收敛，避免占满甚至突破屏幕可视区 */
+    .meiko-drawer-content {
+        max-height: 60vh;
+        padding: 10px 10px;
+    }
+
+    .meiko-module-card {
+        margin-bottom: 8px;
+    }
+
+    .meiko-drawer-header {
+        padding: 10px 10px;
+        min-height: 44px; /* 符合移动端 44px 最小触控规范，防误触 */
+    }
+
+    /* 移动端操作按钮自适应流式排版，加大触控面积 */
+    .CompressedSave-panel .cs-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    .CompressedSave-panel .cs-actions .menu_button {
+        width: 100%;
+        margin: 0;
+        padding: 8px 6px;
+        font-size: 0.88em;
+    }
+
+    /* 复选框与设置行移动端换行与触控保护 */
+    .CompressedSave-panel .cs-row {
+        gap: 8px;
+    }
+    .CompressedSave-panel .checkbox_label {
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* 统计卡片网格双列排布 */
     .CompressedSave-panel .cs-stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
     .CompressedSave-panel .cs-stat-card-wide {
         grid-column: span 2;
+    }
+
+    /* 移动端日志表格容器高度适度收紧 */
+    .CompressedSave-panel .cs-log-wrap {
+        max-height: 180px;
     }
 }

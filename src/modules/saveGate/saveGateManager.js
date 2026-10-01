@@ -1,10 +1,14 @@
 // D:\Projects\SillyTavern-CompressedSave\src\modules\saveGate\saveGateManager.js
+import { diffBodies } from './diffDetective.js';
+
 export class SaveGateManager {
     constructor(getSettings, onFingerprintUpdate) {
         this.getSettings = getSettings;
         this.onFingerprintUpdate = onFingerprintUpdate;
         // path -> { hash: string, at: number, rawSize: number }
         this.fingerprints = new Map();
+        // path -> string（Debug 侦探：上次真实发出的 body 原文，仅内存，不落盘）
+        this.lastBodies = new Map();
         // path -> { running: boolean, queued: { rawHash, rawSize, executeFn, resolve, reject } | null }
         this.slots = new Map();
         // 全局串行上传 Promise 链
@@ -124,6 +128,27 @@ export class SaveGateManager {
                     headers: new Headers({ 'Content-Type': 'application/json' }),
                 });
             }
+
+            // ── 🔍 Debug 侦探：指纹未命中时，与上次 body 做递归 diff，揪出变化字段 ──
+            if (s.diffDetective) {
+                const lastBody = this.lastBodies.get(path);
+                if (typeof lastBody === 'string' && typeof hooks.getBody === 'function') {
+                    const newBody = hooks.getBody();
+                    if (newBody) {
+                        const diffs = diffBodies(path, lastBody, newBody);
+                        if (diffs && diffs.length) {
+                            console.groupCollapsed(
+                                `%c[MeikoDiffDetective]%c 🔍 ${path} 指纹未命中，发现 ${diffs.length} 处差异喵：`,
+                                'color:#e67e22;font-weight:bold', ''
+                            );
+                            for (const line of diffs) console.log(line);
+                            console.groupEnd();
+                        } else if (diffs) {
+                            console.log(`%c[MeikoDiffDetective]%c 🤔 ${path} 指纹不同但 JSON 叶子无差异（可能是序列化顺序变化）喵`, 'color:#e67e22;font-weight:bold', '');
+                        }
+                    }
+                }
+            }
         }
 
         // ── 阀门 2：同路径任务合并（覆盖排队，只留最新）──
@@ -179,6 +204,11 @@ export class SaveGateManager {
                             at: Date.now(),
                             rawSize: cur.rawSize || 0,
                         });
+                        // 🔍 侦探取证：保存本次真实发出的 body 原文，供下次 diff 用
+                        if (this.getSettings().diffDetective && typeof hooks.getBody === 'function') {
+                            const snapshot = hooks.getBody();
+                            if (typeof snapshot === 'string') this.lastBodies.set(path, snapshot);
+                        }
                         this.saveToStorage();
                     }
                     if (cur.resolve) { try { cur.resolve(response); } catch {} }

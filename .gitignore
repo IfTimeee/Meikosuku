@@ -1,0 +1,12 @@
+# 只扒源码参考用，不进仓库喵！
+SillyTavern/
+
+# Node
+node_modules/
+npm-debug.log
+
+# 环境与编辑器
+.env
+.vscode/
+.idea/
+*.swp

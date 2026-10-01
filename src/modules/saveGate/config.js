@@ -15,4 +15,6 @@ export const DEFAULTS = {
     persistDedupe: false,        // 跨刷新保留去重指纹（默认关：刷新保证安全）
     globalSerial: true,          // 全局串行锁：防止多请求并发互踩
     sendTimeoutSec: 180,         // 上传超时熔断（秒）
+    // v2.1 Debug：去重未命中 Diff 侦探（默认关，抓易变字段用）
+    diffDetective: false,
 };

@@ -281,6 +281,7 @@ export default {
                         incStat: k => self.incStat(k),
                         pushLog: e => self.pushLog(e),
                         nowHMS,
+                        getBody: () => (typeof body === 'string' ? body : null),
                     }
                 );
             } catch (err) {
@@ -408,6 +409,13 @@ export default {
                     </label>
                 </div>
 
+                <div class="cs-row">
+                    <label class="checkbox_label" for="sg_diff_detective" style="flex:1;" title="指纹未命中时，在控制台对比新旧请求体，揪出导致去重失效的易变字段">
+                        <input id="sg_diff_detective" type="checkbox" ${s.diffDetective ? 'checked' : ''}>
+                        <span>🔍 Diff 侦探 (Debug)</span>
+                    </label>
+                </div>
+
                 <label for="sg_paths" class="cs-field">
                     <small>拦截路径（每行一个）：</small>
                     <textarea id="sg_paths" class="text_pole cs-paths" rows="2">${s.targetPaths.join('\n')}</textarea>
@@ -498,6 +506,13 @@ export default {
         $('sg_verbose').addEventListener('change', e => {
             s.verbose = e.target.checked;
             persist();
+        });
+        $('sg_diff_detective').addEventListener('change', e => {
+            s.diffDetective = e.target.checked;
+            persist();
+            if (e.target.checked && window.toastr) {
+                window.toastr.info('Meikosuku Diff 侦探已上勤：开关几次条目，去重未命中的差异字段会打印在控制台喵～', undefined, { timeOut: 6000 });
+            }
         });
         $('sg_persist').addEventListener('change', e => {
             s.persistDedupe = e.target.checked;
